@@ -106,7 +106,7 @@ const columns = [
       </div>
       <div class="bar-center">
         <button class="nav-btn">
-          NASTĘPNA STRONA <img src="../components/icons/NastepnaStrona.svg" class="icon-sm icon-white" />
+          NASTĘPNA STRONAA <img src="../components/icons/NastepnaStrona.svg" class="icon-sm icon-white" />
         </button>
         <div class="timer-box">
           <span class="pause-icon">⏸</span>
