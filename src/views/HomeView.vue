@@ -106,8 +106,8 @@ const columns = [
       </div>
       <div class="bar-center">
         <button class="nav-btn">
-          NASTĘPNA STRONAA <img src="../components/icons/NastepnaStrona.svg" class="icon-sm icon-white" />
-        </button>
+          NASTĘPNA STRONA <img src="../components/icons/NastepnaStrona.svg" class="icon-sm icon-white" />
+        </button>F
         <div class="timer-box">
           <span class="pause-icon">⏸</span>
           <span class="timer-val">0:{{ String(seconds).padStart(2, '0') }}</span>
@@ -146,7 +146,7 @@ const columns = [
   gap: 9px;
   padding: 8px;
   padding-bottom: 68px;
-  background: #F3F4F6;
+  background: #ffffff;
   height: 100vh;
   overflow: hidden;
   box-sizing: border-box;
