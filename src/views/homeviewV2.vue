@@ -2,9 +2,11 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import PatientCard from '../components/PatientCard.vue'
 import Powiadomienia from '../components/Powiadomienia.vue'
-import SerceIcon from '../components/icons/Serce.svg'
-import SkalpelIcon from '../components/icons/Skalpel.svg'
-import DrzwiIcon from '../components/icons/Drzwi.svg'
+
+// Dodano ?url na końcu importów, aby bundler (np. Vite) poprawnie załadował pliki jako ścieżki do obrazków
+import SerceIcon from '../components/icons/Serce.svg?url'
+import SkalpelIcon from '../components/icons/Skalpel.svg?url'
+import DrzwiIcon from '../components/icons/Drzwi.svg?url'
 
 const seconds = ref(20)
 let interval: ReturnType<typeof setInterval>
@@ -80,10 +82,10 @@ const columns = [
 ]
 
 const roomsV2 = [
-  { title: 'Sala nr 1', count: 5, page: 'str. 1/2' },
-  { title: 'Sala nr 3', count: 5, page: 'str. 1/2' },
-  { title: 'Sala nr 2', count: 5, page: 'str. 1/2' },
-  { title: 'Sala nr 4', count: 5, page: 'str. 1/2' },
+  { title: 'Sala nr 1', count: 5, page: 'str. 1/2', icon: SerceIcon },
+  { title: 'Sala nr 3', count: 5, page: 'str. 1/2', icon: SerceIcon },
+  { title: 'Sala nr 2', count: 5, page: 'str. 1/2', icon: SerceIcon },
+  { title: 'Sala nr 4', count: 5, page: 'str. 1/2', icon: SerceIcon },
 ]
 
 const samplePatients = [
@@ -97,7 +99,6 @@ const samplePatients = [
 <template>
   <div class="dashboard">
 
-    <!-- V1: widok kategorii -->
     <transition name="slide">
       <div v-if="!showV2" class="columns-area">
         <div class="column" v-for="col in columns" :key="col.title">
@@ -126,16 +127,13 @@ const samplePatients = [
       </div>
     </transition>
 
-    <!-- V2: widok sal + powiadomienia -->
     <transition name="slide">
       <div v-if="showV2" class="v2-area">
         <div class="rooms-grid">
           <div class="room-column" v-for="room in roomsV2" :key="room.title">
             <div class="column-header">
               <div class="header-left">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#141522" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <img :src="room.icon" class="col-icon" />
                 <span class="col-title">{{ room.title }}</span>
               </div>
               <div class="header-right">
@@ -160,18 +158,17 @@ const samplePatients = [
       </div>
     </transition>
 
-    <!-- Dolna belka -->
     <div class="status-bar">
       <div class="bar-left">
         <div class="logo-section">
-          <img src="../components/icons/Hospanel.svg" class="logo-img" />
+          <img src="../components/icons/Hospanel.svg?url" class="logo-img" />
         </div>
         <span class="session"><span class="session-label">SESJA:</span> <span class="session-val">669</span></span>
         <span class="info-badge">INFO</span>
       </div>
       <div class="bar-center">
         <button class="nav-btn">
-          NASTĘPNA STRONA <img src="../components/icons/NastepnaStrona.svg" class="icon-sm icon-white" />
+          NASTĘPNA STRONA <img src="../components/icons/NastepnaStrona.svg?url" class="icon-sm icon-white" />
         </button>
         <div class="timer-box">
           <span class="pause-icon">⏸</span>
@@ -180,25 +177,25 @@ const samplePatients = [
       </div>
       <div class="bar-right">
         <button class="btn-blue">
-          <img src="../components/icons/k1-1.svg" class="icon-sm icon-white" /> K1-L
+          <img src="../components/icons/k1-1.svg?url" class="icon-sm icon-white" /> K1-L
         </button>
         <button class="btn-blue">
-          <img src="../components/icons/odswiez.svg" class="icon-sm icon-white" /> ODŚWIEŻ TERAZ
+          <img src="../components/icons/odswiez.svg?url" class="icon-sm icon-white" /> ODŚWIEŻ TERAZ
         </button>
         <div class="separator"></div>
         <span class="mode-text">
-          <img src="../components/icons/paleta.svg" class="icon-sm" /> DOMYŚLNY
+          <img src="../components/icons/paleta.svg?url" class="icon-sm" /> DOMYŚLNY
         </span>
         <div class="separator"></div>
-        <img src="../components/icons/ksiezyc.svg" class="icon-sm" />
+        <img src="../components/icons/ksiezyc.svg?url" class="icon-sm" />
         <div class="separator"></div>
         <span class="grupuj-text">
-          <img src="../components/icons/KopiujWSekcji.svg" class="icon-sm" />
+          <img src="../components/icons/KopiujWSekcji.svg?url" class="icon-sm" />
           GRUPUJ WG SEKCJI
         </span>
         <div class="separator"></div>
         <span class="nurse-section">
-          <img src="../components/icons/pielegniarka.svg" class="icon-sm" /> PIELĘGNIARKA DASHBOARD
+          <img src="../components/icons/pielegniarka.svg?url" class="icon-sm" /> PIELĘGNIARKA DASHBOARD
         </span>
       </div>
     </div>
