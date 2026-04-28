@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import PatientCard from '../components/PatientCard.vue'
-import Powiadomienia from '../components/Powiadomienia.vue'
 import OaskaCard from '../components/OaskaCard.vue'
+import Powiadomienia from '../components/Powiadomienia.vue'
 
 import SerceIcon from '../components/icons/Serce.svg?url'
 import SkalpelIcon from '../components/icons/Skalpel.svg?url'
@@ -11,34 +11,45 @@ import DrzwiIcon from '../components/icons/Drzwi.svg?url'
 const seconds = ref(20)
 let interval: ReturnType<typeof setInterval>
 
+// 0 = V1, 1 = V2, 2 = V3
 const view = ref(0)
-let wheelCooldown = false
+let wheelCooldown = false // Flaga blokująca kolejne zmiany
 
 const handleWheel = (e: WheelEvent) => {
+  // Jeśli jesteśmy w trakcie "odpoczynku" po scrollu, przerywamy
   if (wheelCooldown) return
-  if (e.deltaY > 50 && view.value < 2) {
+
+  // Próg deltaY (> 30 lub < -30) pomaga ignorować mikro-przesunięcia touchpada
+  if (e.deltaY > 30 && view.value < 2) {
     view.value++
-    wheelCooldown = true
-    setTimeout(() => { wheelCooldown = false }, 800)
-  } else if (e.deltaY < -50 && view.value > 0) {
+    lockScroll()
+  } else if (e.deltaY < -30 && view.value > 0) {
     view.value--
-    wheelCooldown = true
-    setTimeout(() => { wheelCooldown = false }, 800)
+    lockScroll()
   }
+}
+
+// Funkcja blokująca scroll na określoną ilość milisekund
+const lockScroll = () => {
+  wheelCooldown = true
+  setTimeout(() => { 
+    wheelCooldown = false 
+  }, 700) // 700ms opóźnienia - możesz to zmienić, żeby dostosować czułość pod siebie
 }
 
 onMounted(() => {
   interval = setInterval(() => {
     seconds.value = seconds.value > 0 ? seconds.value - 1 : 20
   }, 1000)
-  window.addEventListener('wheel', handleWheel, { passive: true })
+  window.addEventListener('wheel', handleWheel)
 })
 
 onUnmounted(() => {
   clearInterval(interval)
-  window.removeEventListener('wheel', handleWheel)})
+  window.removeEventListener('wheel', handleWheel)
+})
 
-const samplePatients8 = [
+const samplePatients = [
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15' },
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15' },
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15' },
@@ -49,16 +60,14 @@ const samplePatients8 = [
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15' },
 ]
 
-const samplePatients4 = samplePatients8.slice(0, 4)
-
-// V1
+// V1 columns
 const columns = [
-  { title: 'MONITOROWANI', icon: SerceIcon, count: 5, page: 'str. 1/2', patients: samplePatients8 },
-  { title: 'PACJENCI DO OPERACJI', icon: SkalpelIcon, count: 5, page: 'str. 2/3', patients: samplePatients8 },
-  { title: 'PACJENCI DO WYPISU', icon: DrzwiIcon, count: 5, page: 'str. 2/2', patients: samplePatients8 },
+  { title: 'MONITOROWANI', icon: SerceIcon, count: 5, page: 'str. 1/2', patients: samplePatients },
+  { title: 'PACJENCI DO OPERACJI', icon: SkalpelIcon, count: 5, page: 'str. 2/3', patients: samplePatients },
+  { title: 'PACJENCI DO WYPISU', icon: DrzwiIcon, count: 5, page: 'str. 2/2', patients: samplePatients },
 ]
 
-// V2
+// V2 rooms
 const roomsV2 = [
   { title: 'Sala nr 1', count: 5, page: 'str. 1/2' },
   { title: 'Sala nr 3', count: 5, page: 'str. 1/2' },
@@ -66,26 +75,30 @@ const roomsV2 = [
   { title: 'Sala nr 4', count: 5, page: 'str. 1/2' },
 ]
 
-// V3
+const samplePatients4 = samplePatients.slice(0, 4)
+
+// V3 — MONITOROWANI z opaską, pozostałe kolumny normalne
+const v3Columns = [
+  { title: 'PACJENCI DO OPERACJI', icon: SkalpelIcon, count: 5, page: 'str. 2/3', patients: samplePatients },
+  { title: 'PACJENCI DO WYPISU', icon: DrzwiIcon, count: 5, page: 'str. 2/2', patients: samplePatients },
+]
+
 const opaskaPatients = [
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15', puls: 146, saturacja: 98, temperatura: 36.6, komunikat: 'SOS!', alert: true },
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15', puls: null, saturacja: null, temperatura: null, komunikat: 'Pacjent zdjął opaskę', alert: false },
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15', puls: 146, saturacja: 98, temperatura: 36.6, komunikat: 'Upadek: korytarz, sala nr 5', alert: false },
   { name: 'Barnaba Bazyli', roomId: 'T01', patientId: '2024/6920', date: '2024-09-30', time: '12:15', puls: 146, saturacja: 85, temperatura: 36.6, komunikat: 'Niska saturacja!', alert: false },
 ]
-
-const v3Columns = [
-  { title: 'PACJENCI DO OPERACJI', icon: SkalpelIcon, count: 5, page: 'str. 2/3', patients: samplePatients8 },
-  { title: 'PACJENCI DO WYPISU', icon: DrzwiIcon, count: 5, page: 'str. 2/2', patients: samplePatients8 },
-]
 </script>
 
 <template>
   <div class="dashboard">
 
-    <!-- V1 -->
-    <transition name="slide">
-      <div v-if="view === 0" class="columns-area">
+    <!-- JEDEN transition opakowujący wszystkie widoki -->
+    <transition name="slide" mode="out-in">
+
+      <!-- V1 -->
+      <div v-if="view === 0" key="v1" class="columns-area">
         <div class="column" v-for="col in columns" :key="col.title">
           <div class="column-header">
             <div class="header-left">
@@ -110,11 +123,9 @@ const v3Columns = [
           </div>
         </div>
       </div>
-    </transition>
 
-    <!-- V2 -->
-    <transition name="slide">
-      <div v-if="view === 1" class="v2-area">
+      <!-- V2 -->
+      <div v-else-if="view === 1" key="v2" class="v2-area">
         <div class="rooms-grid">
           <div class="room-column" v-for="room in roomsV2" :key="room.title">
             <div class="column-header">
@@ -144,11 +155,10 @@ const v3Columns = [
         </div>
         <Powiadomienia />
       </div>
-    </transition>
 
-    <!-- V3 -->
-    <transition name="slide">
-      <div v-if="view === 2" class="v3-area">
+      <!-- V3 -->
+      <div v-else key="v3" class="v3-area">
+
         <!-- MONITOROWANI z opaską -->
         <div class="column">
           <div class="column-header">
@@ -178,7 +188,8 @@ const v3Columns = [
             />
           </div>
         </div>
-        <!-- Pozostałe 2 kolumny -->
+
+        <!-- Pozostałe 2 kolumny normalne -->
         <div class="column" v-for="col in v3Columns" :key="col.title">
           <div class="column-header">
             <div class="header-left">
@@ -202,7 +213,9 @@ const v3Columns = [
             />
           </div>
         </div>
+
       </div>
+
     </transition>
 
     <!-- Status bar -->

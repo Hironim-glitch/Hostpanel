@@ -43,7 +43,7 @@ const notifications = [
             <span class="pow-freq">{{ n.frequency }}</span>
             <span class="pow-dose">{{ n.dosage }}</span>
           </div>
-          <span class="pow-time">{{ n.time }}</span>
+          <span class="pow-time" :class="{ 'pow-time--green': n.dosage }">{{ n.time }}</span>
         </div>
       </div>
     </div>
@@ -244,5 +244,8 @@ const notifications = [
   white-space: nowrap;
   min-width: 90px;
   text-align: left;
+}
+.pow-time--green {
+  color: #0E9F6E;
 }
 </style>
