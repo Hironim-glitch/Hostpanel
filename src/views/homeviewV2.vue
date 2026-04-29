@@ -130,15 +130,15 @@ const v3Columns = [
               </div>
             </div>
             <div class="cards-grid-v2">
-              <PatientCard
-                v-for="(p, i) in samplePatients4"
-                :key="i"
-                :name="p.name"
-                :roomId="p.roomId"
-                :patientId="p.patientId"
-                :date="p.date"
-                :time="p.time"
-              />
+              <div class="card-scale-wrapper" v-for="(p, i) in samplePatients4" :key="i">
+                <PatientCard
+                  :name="p.name"
+                  :roomId="p.roomId"
+                  :patientId="p.patientId"
+                  :date="p.date"
+                  :time="p.time"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -304,10 +304,27 @@ const v3Columns = [
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(2, 1fr);
-  gap: 8px;
+  gap: 4px;
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.card-scale-wrapper {
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+
+.card-scale-wrapper > * {
+  transform: scale(0.78);
+  transform-origin: top left;
+  width: calc(100% / 0.78);
+  height: calc(100% / 0.78);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* V3 */

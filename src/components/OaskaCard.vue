@@ -10,11 +10,18 @@ defineProps<{
   temperatura?: number | null
   komunikat?: string | null
   alert?: boolean
+  komunikatType?: 'sos' | 'zdjal' | 'upadek' | 'saturacja' | null
 }>()
 </script>
 
 <template>
-  <div class="opaski-card" :class="{ 'opaski-card--alert': alert }">
+  <div
+    class="opaski-card"
+    :class="{
+      'opaski-card--alert': alert && komunikatType !== 'zdjal',
+      'opaski-card--zdjal': komunikatType === 'zdjal',
+    }"
+  >
 
     <!-- Lewa: identyczna jak PatientCard -->
     <div class="left">
@@ -130,10 +137,9 @@ defineProps<{
     <!-- Prawa: Parametry z opaski -->
     <div class="right">
 
+      <!-- Nagłówek z Opaska.svg -->
       <div class="right-title">
-        <svg width="7" height="7" viewBox="0 0 24 24" fill="none">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#133AD8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <img src="./icons/Opaska.svg" class="title-icon" />
         <span class="right-title-text">Parametry z opaski</span>
       </div>
 
@@ -161,43 +167,38 @@ defineProps<{
         </div>
       </div>
 
-      <!-- Komunikat — zawsze czerwony border -->
+      <!-- Komunikat -->
       <div v-if="komunikat" class="komunikat-section">
-        <div class="komunikat-box">
-          <span class="komunikat-label">KOMUNIKAT</span>
-          <span class="komunikat-text" :class="{ 'komunikat-text--alert': alert }">
-            {{ komunikat }}
-          </span>
+        <div
+          class="komunikat-box"
+          :style="{ borderColor: komunikatType === 'zdjal' ? '#FF5A1F' : '#E02424' }"
+        >
+          <span
+            class="komunikat-label"
+            :style="{
+              color: komunikatType === 'zdjal' ? '#FF5A1F' : '#E02424',
+            }"
+          >KOMUNIKAT</span>
+          <span
+            class="komunikat-text"
+            :style="{ color: '#111928' }"
+          >{{ komunikat }}</span>
         </div>
       </div>
 
-      <!-- Dolne przyciski — wyśrodkowane -->
+      <!-- Dolne przyciski z prawdziwymi ikonami -->
       <div class="right-actions">
         <button class="right-action-btn" title="Serce">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#E02424" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <img src="./icons/RedSerce.svg" class="btn-icon" />
         </button>
-        <button class="right-action-btn" title="Wykres">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="12" width="4" height="9" rx="1" stroke="#E02424" stroke-width="2"/>
-            <rect x="10" y="7" width="4" height="14" rx="1" stroke="#E02424" stroke-width="2"/>
-            <rect x="17" y="3" width="4" height="18" rx="1" stroke="#E02424" stroke-width="2"/>
-          </svg>
+        <button class="right-action-btn" title="Brak zasięgu">
+          <img src="./icons/BrakZasiegu.svg" class="btn-icon" />
         </button>
         <button class="right-action-btn" title="Ostrzeżenie">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#E02424" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 9v4" stroke="#E02424" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="12" cy="17" r="1" fill="#E02424"/>
-          </svg>
+          <img src="./icons/CzerwonyWykrzyknik.svg" class="btn-icon" />
         </button>
         <button class="right-action-btn" title="Płuca">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3v18" stroke="#E02424" stroke-width="2" stroke-linecap="round"/>
-            <path d="M12 6C12 6 7 7 5 10C3 13 3 17 5 19C7 21 10 20 11 18" stroke="#E02424" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 6C12 6 17 7 19 10C21 13 21 17 19 19C17 21 14 20 13 18" stroke="#E02424" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <img src="./icons/CzerwonyPluca.svg" class="btn-icon" />
         </button>
       </div>
 
@@ -222,7 +223,12 @@ defineProps<{
   border-width: 2px;
 }
 
-/* ── Lewa strona (1:1 PatientCard) ── */
+.opaski-card--zdjal {
+  border-color: #FF5A1F;
+  border-width: 2px;
+}
+
+/* ── Lewa strona ── */
 .left {
   flex: 1;
   padding: 12px;
@@ -234,315 +240,173 @@ defineProps<{
   box-sizing: border-box;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.card-header { display: flex; justify-content: space-between; align-items: center; }
+.header-left { display: flex; align-items: center; gap: 6px; }
 
 .status-square {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: #133AD8;
-  border: 2px solid white;
-  color: white;
-  font-family: Inter, sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 6px;
+  background: #133AD8; border: 2px solid white; color: white;
+  font-family: Inter, sans-serif; font-weight: 500; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
 .info-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: #E8ECFC;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 6px; background: #E8ECFC;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
 }
 
 .room-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: #E8ECFC;
-  border-radius: 6px;
-  padding: 4px 8px;
+  display: flex; align-items: center; gap: 4px;
+  background: #E8ECFC; border-radius: 6px; padding: 4px 8px;
 }
 
-.room-text {
-  font-size: 14px;
-  color: #133AD8;
-  font-family: Inter, sans-serif;
-  font-weight: 500;
-}
+.room-text { font-size: 14px; color: #133AD8; font-family: Inter, sans-serif; font-weight: 500; }
 
 .icon-btn {
-  background: #E8ECFC;
-  border: none;
-  border-radius: 6px;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #E8ECFC; border: none; border-radius: 6px;
+  width: 36px; height: 36px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
 
-.card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
+.card-body { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 
-.name {
-  font-family: Inter, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #111928;
-  margin: 0;
-}
+.name { font-family: Inter, sans-serif; font-size: 18px; font-weight: 600; color: #111928; margin: 0; }
 
-.meta-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.meta-row { display: flex; align-items: center; gap: 6px; }
+.meta-item { display: flex; align-items: center; gap: 3px; }
+.meta { font-size: 11px; color: #555; margin: 0; }
+.divider { color: #ccc; font-size: 11px; }
 
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.meta {
-  font-size: 11px;
-  color: #555;
-  margin: 0;
-}
-
-.divider {
-  color: #ccc;
-  font-size: 11px;
-}
-
-.vitals {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  align-self: flex-start;
-}
+.vitals { display: flex; align-items: center; gap: 2px; align-self: flex-start; }
 
 .vital-icon-box {
-  width: 36px;
-  height: 36px;
-  background: #FBD5D5;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 36px; height: 36px; background: #FBD5D5; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-
 .vital-icon-img { width: 22px; height: 22px; }
 
-.vital-item {
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-  padding: 4px;
-  width: 35px;
-  height: 25px;
-}
-
-.vital-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 2px;
-}
-
+.vital-item { display: flex; align-items: center; border-radius: 4px; padding: 4px; width: 35px; height: 25px; }
+.vital-content { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 2px; }
 .val-col { display: flex; flex-direction: column; gap: 1px; }
 .val { font-size: 8px; font-weight: 600; color: #111928; line-height: 1; }
 .label { font-size: 6px; line-height: 1; }
 .arrow { font-size: 8px; line-height: 1; }
 
-.actions {
-  display: flex;
-  align-items: center;
-  padding-top: 4px;
-}
-
-.actions-left {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
+.actions { display: flex; align-items: center; padding-top: 4px; }
+.actions-left { display: flex; gap: 6px; align-items: center; }
 
 .action-btn {
-  background: #E8ECFC;
-  border: none;
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: background 0.15s ease;
-  box-sizing: border-box;
+  background: #E8ECFC; border: none; cursor: pointer;
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; transition: background 0.15s ease; box-sizing: border-box;
 }
-
 .action-btn:hover { background: #d0d8f8; }
 .action-icon { width: 22px; height: 22px; }
 
 /* ── Prawa strona ── */
 .right {
   flex: 1.2;
-  padding: 6px;          /* 12px / 2 */
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;              /* 8px / 2 */
+  gap: 6px;
   min-width: 0;
-  background: #fff;
+  background: #F2F4F7;
   box-sizing: border-box;
 }
 
-.right-title {
-  display: flex;
-  align-items: center;
-  gap: 3px;              /* 6px / 2 */
-  flex-shrink: 0;
-}
+.right-title { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.title-icon { width: 15px; height: 15px; }
 
 .right-title-text {
-  font-size: 6px;        /* 12px / 2 */
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   color: #133AD8;
   font-family: Inter, sans-serif;
 }
 
 /* Parametry */
-.params {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-}
+.params { display: flex; flex-direction: column; flex: 1; justify-content: center; }
 
 .param-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 22px;          /* 45px / 2 */
-  padding: 0 1px;
+  height: 22px;
 }
 
-.param-divider {
-  height: 1px;
-  background: #F3F4F6;
-}
+.param-divider { height: 1px; background: #F3F4F6; }
 
 .param-name {
-  font-size: 7px;        /* 13px / 2 → zaokrąglam do czytelnego */
-  color: #374151;
+  font-size: 13px;
+  line-height: 150%;
+  color: #111928;
   font-family: Inter, sans-serif;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .param-value {
-  font-size: 7px;        /* 13px / 2 */
+  font-size: 13px;
+  line-height: 150%;
   font-weight: 500;
   color: #111928;
   font-family: Inter, sans-serif;
 }
 
-.param-na {
-  color: #9CA3AF;
-  font-weight: 400;
-}
+.param-na { color: #9CA3AF; }
 
 /* Komunikat */
-.komunikat-section {
-  flex-shrink: 0;
-}
+.komunikat-section { flex-shrink: 0; }
 
 .komunikat-box {
   position: relative;
   border: 1px solid #E02424;
-  border-radius: 3px;    /* 6px / 2 */
-  padding: 5px 6px 4px;  /* 10px 12px 8px / 2 */
-  background: #fff;
+  border-radius: 6px;
+  padding: 8px 12px 6px;
+  background: #F2F4F7;
 }
 
 .komunikat-label {
   position: absolute;
-  top: -5px;             /* -8px / 2 */
-  left: 5px;             /* 10px / 2 */
-  background: #fff;
-  padding: 0 2px;
-  font-size: 5px;        /* 9px / 2 → min czytelny */
-  font-weight: 700;
-  color: #E02424;
-  letter-spacing: 0.08em;
+  top: -8px; left: 10px;
+  background: #F2F4F7;
+  padding: 0 4px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
   font-family: Inter, sans-serif;
 }
 
 .komunikat-text {
-  font-size: 7px;        /* 13px / 2 */
+  font-size: 15px;
   font-weight: 500;
-  color: #111928;
   font-family: Inter, sans-serif;
   display: block;
   text-align: center;
 }
 
-.komunikat-text--alert {
-  font-weight: 700;
-  color: #E02424;
-}
-
 /* Dolne przyciski */
 .right-actions {
   display: flex;
-  gap: 3px;              /* 6px / 2 */
+  gap: 3px;
   justify-content: center;
   flex-shrink: 0;
 }
 
 .right-action-btn {
-  background: #FBD5D5;
+  background: #FDE8E8;
   border: none;
-  border-radius: 3px;    /* 6px / 2 */
-  width: 18px;           /* 36px / 2 */
-  height: 18px;          /* 36px / 2 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 6px;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   transition: background 0.15s ease;
   box-sizing: border-box;
+  padding: 9px;
 }
 
-.right-action-btn:hover { background: #f9bfbf; }
+.right-action-btn:hover { background: #fbd5d5; }
 
-.right-action-btn svg {
-  width: 10px;           /* 16px / 2 → ~10px */
-  height: 10px;
-}
+.btn-icon { width: 18px; height: 18px; }
 </style>
